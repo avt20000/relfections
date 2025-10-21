@@ -1,0 +1,84 @@
+/* Parent context: you can put this on a common wrapper, or just leave the transform
+   using perspective() inline in the animation below. */
+:root {
+  --rush-duration: 800ms;
+  --rush-ease: cubic-bezier(.2,.7,.1,1);
+}
+
+.reveal[hidden] { display: none !important; }
+
+/* Base state so elements are ready to animate smoothly */
+.reveal {
+  transform-origin: center center;
+  backface-visibility: hidden;
+  will-change: transform, filter, opacity;
+}
+
+/* Trigger class added by JS when revealing */
+.fx-rush-in {
+  animation: rush-in var(--rush-duration) var(--rush-ease) both;
+}
+
+/* The effect: “from far away + small + blurred + faint” -> “full-size, sharp, opaque” */
+@keyframes rush-in {
+  0% {
+    /* perspective() gives the 3D camera feel even without a parent perspective */
+    transform: perspective(1000px) translateZ(-260px) scale(.24);
+    filter: blur(8px);
+    opacity: 0;
+  }
+  60% {
+    transform: perspective(1000px) translateZ(-40px) scale(.96);
+    filter: blur(2px);
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(1000px) translateZ(0) scale(1);
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .fx-rush-in {
+    animation: fade-in 250ms ease-out both;
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}
+
+/* =====================
+   Inverse (rush-out)
+   ===================== */
+.fx-rush-out {
+  animation: rush-out var(--rush-duration) var(--rush-ease) both;
+}
+
+/* “full-size, sharp, opaque” -> “far away, small, faint, blurred” */
+@keyframes rush-out {
+  0% {
+    transform: perspective(1000px) translateZ(0) scale(1);
+    filter: blur(0);
+    opacity: 1;
+  }
+  40% {
+    transform: perspective(1000px) translateZ(-40px) scale(.96);
+    filter: blur(2px);
+    opacity: .5;
+  }
+  100% {
+    transform: perspective(1000px) translateZ(-260px) scale(.24);
+    filter: blur(8px);
+    opacity: 0;
+  }
+}
+
+
+body.black-bg {
+  background-color: #000;
+  transition: background-color 0.4s ease;
+}
+
